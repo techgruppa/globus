@@ -4,1193 +4,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fontenehus Globus</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #040d21;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        #globeViz {
-            width: 100vw;
-            height: 100vh;
-        }
-
-        /* Hexagon marker — hollow with border */
-        .hex-outer {
-            width: 14px;
-            height: 14px;
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .hex-outer:hover {
-            transform: scale(1.4);
-        }
-
-        .hex-outer.norway {
-            background: #ff4455;
-            filter: drop-shadow(0 0 4px rgba(255, 68, 85, 0.6));
-        }
-
-        .hex-outer.intl {
-            background: #ffaa22;
-            filter: drop-shadow(0 0 4px rgba(255, 170, 34, 0.6));
-        }
-
-        /* Inner cutout to make it hollow */
-        .hex-inner {
-            width: 8px;
-            height: 8px;
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            background: #040d21;
-        }
-
-        /* Hex marker label — hidden by default, shown on click */
-        .hex-label {
-            position: absolute;
-            top: 18px;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            font-size: 9px;
-            color: #fff;
-            text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.5);
-            pointer-events: none;
-            font-weight: 600;
-            opacity: 0;
-            transition: opacity 0.25s;
-        }
-
-        .hex-label.visible {
-            opacity: 1;
-        }
-
-        /* Click popup with website link */
-        #marker-popup {
-            position: fixed;
-            padding: 12px 18px;
-            background: rgba(10, 20, 40, 0.96);
-            border: 1px solid rgba(100, 200, 255, 0.4);
-            border-radius: 10px;
-            color: #d0eaff;
-            font-size: 13px;
-            pointer-events: auto;
-            opacity: 0;
-            transition: opacity 0.2s;
-            z-index: 200;
-            backdrop-filter: blur(10px);
-            max-width: 280px;
-            display: none;
-        }
-
-        #marker-popup.visible {
-            opacity: 1;
-            display: block;
-        }
-
-        #marker-popup .popup-name {
-            font-weight: 700;
-            font-size: 14px;
-            color: #fff;
-            margin-bottom: 2px;
-        }
-
-        #marker-popup .popup-country {
-            opacity: 0.7;
-            font-size: 12px;
-            margin-bottom: 8px;
-        }
-
-        #marker-popup .popup-link {
-            display: inline-block;
-            color: #4fc3f7;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border: 1px solid rgba(79, 195, 247, 0.4);
-            border-radius: 6px;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        #marker-popup .popup-link:hover {
-            background: rgba(79, 195, 247, 0.2);
-            color: #fff;
-        }
-
-        /* Country label styling (rendered by globe.gl label layer) */
-        .country-label {
-            color: rgba(160, 200, 240, 0.5);
-            font-size: 11px;
-            font-family: 'Segoe UI', sans-serif;
-            pointer-events: none;
-            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
-        }
-
-        /* Tooltip on hover */
-        #tooltip {
-            position: fixed;
-            padding: 10px 16px;
-            background: rgba(10, 20, 40, 0.94);
-            border: 1px solid rgba(100, 200, 255, 0.35);
-            border-radius: 8px;
-            color: #d0eaff;
-            font-size: 13px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-            z-index: 100;
-            backdrop-filter: blur(8px);
-        }
-
-        #tooltip.visible {
-            opacity: 1;
-        }
-
-        #tooltip .tt-name {
-            font-weight: 700;
-            font-size: 14px;
-            color: #fff;
-        }
-
-        #tooltip .tt-country {
-            opacity: 0.7;
-            font-size: 12px;
-            margin-top: 3px;
-        }
-    </style>
+    <title>FH Presentasjon</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="logo-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
+    <div class="presentation-container">
+        <!-- Animated Logo Header -->
+        <div class="logo-header">
+            <img src="logo.png" alt="FH Logo" class="floating-logo" id="fullscreenToggle" title="Klikk for fullskjerm">
+        </div>
 
-    <div id="globeViz"></div>
-    <div id="tooltip">
-        <div class="tt-name"></div>
-        <div class="tt-country"></div>
+        <!-- Background Logo Watermark -->
+        <div class="logo-watermark">
+            <img src="logo.png" alt="FH Background">
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Slides Container -->
+        <div class="slides-wrapper" id="slidesWrapper">
+            <!-- Slide 1 - Welcome -->
+            <div class="slide active" data-slide="1">
+                <div class="slide-content">
+                    <div class="logo-showcase animate-in">
+                        <div class="logo-container">
+                            <div class="hexagon-glow"></div>
+                            <img src="logo.png" alt="FH Logo" class="main-logo">
+                            <div class="particles">
+                                <div class="particle"></div>
+                                <div class="particle"></div>
+                                <div class="particle"></div>
+                                <div class="particle"></div>
+                                <div class="particle"></div>
+                                <div class="particle"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-header">
+                        <h1 class="slide-title animate-in delay-1">Velkommen til FHA Presentasjon</h1>
+                        <p class="slide-subtitle animate-in delay-2">En moderne presentasjonsopplevelse</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 - Placeholder -->
+            <div class="slide" data-slide="2">
+                <div class="slide-content">
+                    <div class="slide-header">
+                        <h1 class="slide-title">Slide 2</h1>
+                        <p class="slide-subtitle">Din historie starter her</p>
+                    </div>
+                    <div class="slide-media">
+                        <div class="placeholder-media">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor"
+                                    stroke-width="2" />
+                                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+                                <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <p>Bilde eller video her</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3 - Placeholder -->
+            <div class="slide" data-slide="3">
+                <div class="slide-content">
+                    <div class="slide-header">
+                        <h1 class="slide-title">Slide 3</h1>
+                        <p class="slide-subtitle">Engasjer publikum ditt</p>
+                    </div>
+                    <div class="slide-media">
+                        <div class="placeholder-media">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M14.7519 11.1679L11.5547 9.03647C10.8901 8.59343 10 9.06982 10 9.86852V14.1315C10 14.9302 10.8901 15.4066 11.5547 14.9635L14.7519 12.8321C15.3457 12.4362 15.3457 11.5638 14.7519 11.1679Z"
+                                    stroke="currentColor" stroke-width="2" />
+                                <path
+                                    d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                                    stroke="currentColor" stroke-width="2" />
+                            </svg>
+                            <p>Bilde eller video her</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4 - Placeholder -->
+            <div class="slide" data-slide="4">
+                <div class="slide-content">
+                    <div class="slide-header">
+                        <h1 class="slide-title">Takk for oppmerksomheten!</h1>
+                        <p class="slide-subtitle">Ønsker deg en fin dag</p>
+                    </div>
+                    <div class="slide-media">
+                        <div class="placeholder-media">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path
+                                    d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            <p>Bilde eller video her</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="nav-controls">
+            <button class="nav-btn prev-btn" id="prevBtn" aria-label="Forrige slide">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+            <button class="nav-btn next-btn" id="nextBtn" aria-label="Neste slide">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Slide Counter -->
+        <div class="slide-counter" id="slideCounter">
+            <span class="current-slide">1</span>
+            <span class="separator">/</span>
+            <span class="total-slides">4</span>
+        </div>
+
+        <!-- Keyboard Hint -->
+        <div class="keyboard-hint" id="keyboardHint">
+            <p>Bruk piltastene ← → eller sveip for å navigere</p>
+        </div>
     </div>
-    <div id="marker-popup">
-        <div class="popup-name"></div>
-        <div class="popup-country"></div>
-        <a class="popup-link" href="#" target="_blank" rel="noopener">Visit website &rarr;</a>
-    </div>
 
-    <script src="globe.gl.min.js"></script>
-
-    <script>
-        (function () {
-            'use strict';
-
-            // ============================================================
-            //  FONTENEHUS DATA — from Clubhouse International directory
-            //  Source: https://clubhouse-intl.org/what-we-do/international-directory/
-            // ============================================================
-            var locations = [
-                // ===================== ARGENTINA =====================
-                { name: 'Casa del Paraná', country: 'Argentina', lat: -32.9468, lng: -60.6393, type: 'intl' },
-                { name: 'Casaclub Baires', country: 'Argentina', lat: -34.6037, lng: -58.3816, type: 'intl' },
-                // ===================== AUSTRALIA =====================
-                { name: 'Diamond House Clubhouse', country: 'Australia', lat: -37.8136, lng: 144.9331, type: 'intl' },
-                { name: 'Kindred Clubhouse', country: 'Australia', lat: -27.4698, lng: 153.0551, type: 'intl' },
-                { name: 'Stepping Stone Clubhouse', country: 'Australia', lat: -33.8688, lng: 151.2393, type: 'intl' },
-                { name: 'Stepping Stone North', country: 'Australia', lat: -33.7688, lng: 151.2893, type: 'intl' },
-                { name: 'The Junction Clubhouse', country: 'Australia', lat: -16.9186, lng: 145.7781, type: 'intl' },
-                // ===================== CANADA =====================
-                { name: 'Beyond the Heart Clubhouse', country: 'Canada', lat: 43.6532, lng: -79.4132, type: 'intl' },
-                { name: 'Connections Place', country: 'Canada', lat: 48.430520709805, lng: -123.363987264859, type: 'intl' },
-                { name: 'Oak Centre', country: 'Canada', lat: 43.2557, lng: -79.8711, type: 'intl' },
-                { name: 'Pathways Clubhouse Society of Richmond', country: 'Canada', lat: 49.162570987438, lng: -123.135429026156, type: 'intl' },
-                { name: 'Potential Place', country: 'Canada', lat: 51.0447, lng: -114.0519, type: 'intl' },
-                { name: 'Progress Place', country: 'Canada', lat: 43.6532, lng: -79.3832, type: 'intl' },
-                { name: 'UP House', country: 'Canada', lat: 45.494859998811, lng: -73.650792880752, type: 'intl' },
-                // ===================== DENMARK =====================
-                { name: 'Fountain House Copenhagen', country: 'Denmark', lat: 55.6761, lng: 12.5683, type: 'intl' },
-                { name: 'Kildehuset Fountain House/Aalborg', country: 'Denmark', lat: 57.0488, lng: 9.9217, type: 'intl' },
-                // ===================== ESTONIA =====================
-                { name: 'Haabersti Klubimaja', country: 'Estonia', lat: 59.437, lng: 24.7536, type: 'intl' },
-                // ===================== FINLAND =====================
-                { name: 'Helsingin Klubitalo', country: 'Finland', lat: 60.1699, lng: 24.9384, type: 'intl' },
-                { name: 'Klubbhus Fontana', country: 'Finland', lat: 63.096, lng: 21.6164, type: 'intl' },
-                { name: 'Klubbhuset Pelaren', country: 'Finland', lat: 59.8586, lng: 17.6389, type: 'intl' },
-                { name: 'Näsinkulman Klubitalo', country: 'Finland', lat: 61.49767658743, lng: 23.756685761622, type: 'intl' },
-                { name: 'Suvimäen Klubitalo', country: 'Finland', lat: 62.252670313349, lng: 25.748225537012, type: 'intl' },
-                { name: 'Tuusulanjärven Klubitalo', country: 'Finland', lat: 60.477208122833, lng: 25.092899596828, type: 'intl' },
-                { name: 'Walonkulman Klubitalo', country: 'Finland', lat: 61.4978, lng: 23.801, type: 'intl' },
-                // ===================== FRANCE =====================
-                { name: 'Clubhouse Bastia', country: 'France', lat: 42.6973, lng: 9.4509, type: 'intl' },
-                { name: 'Clubhouse Bordeaux', country: 'France', lat: 44.8378, lng: -0.5792, type: 'intl' },
-                { name: 'Clubhouse Lyon', country: 'France', lat: 45.764, lng: 4.8357, type: 'intl' },
-                { name: 'Clubhouse Marseille', country: 'France', lat: 43.2965, lng: 5.3698, type: 'intl' },
-                { name: 'Clubhouse Nantes', country: 'France', lat: 47.2184, lng: -1.5536, type: 'intl' },
-                { name: 'Clubhouse Paris', country: 'France', lat: 48.8566, lng: 2.3522, type: 'intl' },
-                { name: 'Clubhouse Rennes', country: 'France', lat: 48.1173, lng: -1.6778, type: 'intl' },
-                { name: 'Clubhouse Rouen', country: 'France', lat: 49.4432, lng: 1.0999, type: 'intl' },
-                { name: 'Clubhouse de Lille', country: 'France', lat: 50.6292, lng: 3.0573, type: 'intl' },
-                // ===================== GHANA =====================
-                { name: 'Clubhouse Ghana', country: 'Ghana', lat: 5.6037, lng: -0.187, type: 'intl' },
-                // ===================== GIBRALTAR =====================
-                { name: 'Clubhouse Gibraltar', country: 'Gibraltar', lat: 36.1408, lng: -5.3536, type: 'intl' },
-                // ===================== INDIA =====================
-                { name: 'SEVAC Clubhouse of India', country: 'India', lat: 22.463459389633, lng: 88.3153772788, type: 'intl' },
-                // ===================== ISLAND =====================
-                { name: 'Klúbburinn Geysir', country: 'Island', lat: 64.140716802394, lng: -21.902956292919, type: 'intl' },
-                // ===================== ISRAEL =====================
-                { name: 'Alon Clubhouse', country: 'Israel', lat: 32.788905325897, lng: 35.536986138517, type: 'intl' },
-                { name: 'Clubhouse Afula', country: 'Israel', lat: 32.6071, lng: 35.2882, type: 'intl' },
-                { name: 'Jerusalem Clubhouse', country: 'Israel', lat: 31.7683, lng: 35.2337, type: 'intl' },
-                // ===================== ITALY =====================
-                { name: 'Club Itaca Milano', country: 'Italy', lat: 45.4642, lng: 9.19, type: 'intl' },
-                { name: 'Club Itaca Roma', country: 'Italy', lat: 41.9028, lng: 12.4964, type: 'intl' },
-                // ===================== JAPAN =====================
-                { name: 'Clubhouse Habataki', country: 'Japan', lat: 35.6762, lng: 139.7003, type: 'intl' },
-                { name: 'Clubhouse Yuusen', country: 'Japan', lat: 35.6762, lng: 139.6203, type: 'intl' },
-                { name: 'Sun Marina', country: 'Japan', lat: 35.7691, lng: 139.698, type: 'intl' },
-                // ===================== KAZAKHSTAN =====================
-                { name: 'Alrami Clubhouse', country: 'Kazakhstan', lat: 43.222, lng: 76.8512, type: 'intl' },
-                // ===================== MEXICO =====================
-                { name: 'Guadalajara Clubhouse A.C.', country: 'Mexico', lat: 20.674161223, lng: -103.336727247, type: 'intl' },
-                // ===================== NEDERLAND =====================
-                { name: 'Clubhouse De Waterheuvel', country: 'Nederland', lat: 52.3676, lng: 4.9041, type: 'intl' },
-                // ===================== NORGE =====================
-                { name: 'Fontenehuset Arendal', country: 'Norge', lat: 58.4609, lng: 8.7726, type: 'norway' },
-                { name: 'Fontenehuset Asker', country: 'Norge', lat: 59.8335, lng: 10.4357, type: 'norway' },
-                { name: 'Fontenehuset Bergen', country: 'Norge', lat: 60.3913, lng: 5.3221, type: 'norway' },
-                { name: 'Fontenehuset Drammen', country: 'Norge', lat: 59.7441, lng: 10.2045, type: 'norway' },
-                { name: 'Fontenehuset Fredrikstad', country: 'Norge', lat: 59.2181, lng: 10.9298, type: 'norway' },
-                { name: 'Fontenehuset Gjøvik', country: 'Norge', lat: 60.7957, lng: 10.6917, type: 'norway' },
-                { name: 'Fontenehuset Harstad', country: 'Norge', lat: 68.7984, lng: 16.5412, type: 'norway' },
-                { name: 'Fontenehuset Hønefoss', country: 'Norge', lat: 60.1683, lng: 10.2556, type: 'norway' },
-                { name: 'Fontenehuset Kongsberg', country: 'Norge', lat: 59.6631, lng: 9.6465, type: 'norway' },
-                { name: 'Fontenehuset Oslo Sør', country: 'Norge', lat: 59.8665, lng: 10.8132, type: 'norway' },
-                { name: 'Fontenehuset Oslo sentrum', country: 'Norge', lat: 59.9139, lng: 10.7522, type: 'norway' },
-                { name: 'Fontenehuset Oslo Øst', country: 'Norge', lat: 59.9131, lng: 10.7942, type: 'norway' },
-                { name: 'Fontenehuset Rygge', country: 'Norge', lat: 59.3784, lng: 10.7145, type: 'norway' },
-                { name: 'Fontenehuset Senja', country: 'Norge', lat: 69.1832, lng: 17.1088, type: 'norway' },
-                { name: 'Fontenehuset Stavanger', country: 'Norge', lat: 58.969, lng: 5.7331, type: 'norway' },
-                { name: 'Fontenehuset Trondheim', country: 'Norge', lat: 63.4305, lng: 10.3951, type: 'norway' },
-                { name: 'Fontenehuset Ullensaker', country: 'Norge', lat: 60.1262, lng: 11.17, type: 'norway' },
-                { name: 'Fontenehuset i Tromsø', country: 'Norge', lat: 69.6492, lng: 18.9553, type: 'norway' },
-                { name: 'Fontenehuset Ålesund', country: 'Norge', lat: 62.4722, lng: 6.1495, type: 'norway' },
-                { name: 'Stiftelsen Fontenehuset Bærum', country: 'Norge', lat: 59.8938, lng: 10.5233, type: 'norway' },
-                { name: 'Stiftelsen Fontenehuset Nordre Follo', country: 'Norge', lat: 59.7145, lng: 10.835, type: 'norway' },
-                // ===================== PEOPLE'S REPUBLIC OF CHINA =====================
-                { name: 'Heart Wing Clubhouse', country: 'People\'s Republic of China', lat: 28.19874, lng: 112.97087, type: 'intl' },
-                { name: 'Hope Clubhouse (Xi Wang Zhi Guang)', country: 'People\'s Republic of China', lat: 30.65999, lng: 104.03258, type: 'intl' },
-                { name: 'Sunshine Heart Clubhouse', country: 'People\'s Republic of China', lat: 28.0107, lng: 101.671, type: 'intl' },
-                // ===================== POLEN =====================
-                { name: 'Warszawski Dom pod Fontanną', country: 'Polen', lat: 52.246548846479, lng: 20.995403044389, type: 'intl' },
-                // ===================== REPUBLIC OF IRELAND =====================
-                { name: 'Cairdeas Clubhouse', country: 'Republic of Ireland', lat: 53.3498, lng: -6.2903, type: 'intl' },
-                { name: 'Conai Clubhouse', country: 'Republic of Ireland', lat: 53.3498, lng: -6.3103, type: 'intl' },
-                { name: 'Platinum Clubhouse', country: 'Republic of Ireland', lat: 53.2707, lng: -9.0568, type: 'intl' },
-                { name: 'Rainbow Clubhouse', country: 'Republic of Ireland', lat: 52.6638, lng: -8.6267, type: 'intl' },
-                { name: 'Saol Clubhouse', country: 'Republic of Ireland', lat: 51.8969, lng: -8.4863, type: 'intl' },
-                { name: 'Suaimhneas Clubhouse', country: 'Republic of Ireland', lat: 53.3498, lng: -6.2703, type: 'intl' },
-                // ===================== REPUBLIC OF KOREA =====================
-                { name: 'Besor Ravine', country: 'Republic of Korea', lat: 37.4563, lng: 126.7052, type: 'intl' },
-                { name: 'Chamsari', country: 'Republic of Korea', lat: 37.5665, lng: 127.018, type: 'intl' },
-                { name: 'Clubhouse Happy Together', country: 'Republic of Korea', lat: 35.1796, lng: 129.1056, type: 'intl' },
-                { name: 'Life-nest', country: 'Republic of Korea', lat: 37.5565, lng: 126.938, type: 'intl' },
-                { name: 'NulPooRum', country: 'Republic of Korea', lat: 37.4838, lng: 127.0507, type: 'intl' },
-                { name: 'Saebeot Clubhouse', country: 'Republic of Korea', lat: 37.53696, lng: 127.14513, type: 'intl' },
-                { name: 'Seodaemun Haebeotnuri', country: 'Republic of Korea', lat: 37.56897, lng: 126.91516, type: 'intl' },
-                { name: 'Song-guk Clubhouse', country: 'Republic of Korea', lat: 35.8714, lng: 128.6514, type: 'intl' },
-                { name: 'Taiwha Fountain House', country: 'Republic of Korea', lat: 37.5065, lng: 127.0594, type: 'intl' },
-                { name: 'Taiwha Sunrising Clubhouse', country: 'Republic of Korea', lat: 37.48405, lng: 127.09963, type: 'intl' },
-                { name: 'Vitamin', country: 'Republic of Korea', lat: 36.79834, lng: 127.12945, type: 'intl' },
-                // ===================== REPUBLIC OF KOSOVO =====================
-                { name: 'Klubi Deshira', country: 'Republic of Kosovo', lat: 42.668816015436, lng: 21.169734476679, type: 'intl' },
-                // ===================== RUSSIAN FEDERATION =====================
-                { name: 'Russia House', country: 'Russian Federation', lat: 55.692444480664, lng: 37.494633400274, type: 'intl' },
-                // ===================== STORBRITANNIA =====================
-                { name: 'Mosaic Clubhouse', country: 'Storbritannia', lat: 51.4636, lng: -0.1136, type: 'intl' },
-                // ===================== SVERIGE =====================
-                { name: 'Falkenberg Fontänhus', country: 'Sverige', lat: 56.899185887025, lng: 12.493992118395, type: 'intl' },
-                { name: 'Fontänhuset B├Ñstad', country: 'Sverige', lat: 56.423047560464, lng: 12.847707175113, type: 'intl' },
-                { name: 'Fontänhuset Falun', country: 'Sverige', lat: 60.6065, lng: 15.6355, type: 'intl' },
-                { name: 'Fontänhuset G├Âteborg', country: 'Sverige', lat: 57.699055861542, lng: 11.947000768011, type: 'intl' },
-                { name: 'Fontänhuset Helsingborg', country: 'Sverige', lat: 56.0465, lng: 12.6945, type: 'intl' },
-                { name: 'Fontänhuset Malm├Â', country: 'Sverige', lat: 55.604010355021, lng: 12.998281732356, type: 'intl' },
-                { name: 'Fontänhuset Nyk├Âping', country: 'Sverige', lat: 58.748723146854, lng: 17.008218456529, type: 'intl' },
-                { name: 'Fontänhuset Sk├Ândal', country: 'Sverige', lat: 59.251103954972, lng: 18.123495466133, type: 'intl' },
-                { name: 'Fontänhuset Varberg', country: 'Sverige', lat: 57.1058, lng: 12.2516, type: 'intl' },
-                { name: 'Fontänhuset ├älmhult', country: 'Sverige', lat: 56.5514, lng: 14.139, type: 'intl' },
-                { name: 'Fontänhuset ├ûrebro', country: 'Sverige', lat: 59.265075900903, lng: 15.230851045661, type: 'intl' },
-                { name: 'Fountain House/Stockholm', country: 'Sverige', lat: 59.316853154133, lng: 18.071836707216, type: 'intl' },
-                { name: 'Lunds Fontänhus', country: 'Sverige', lat: 55.703166800413, lng: 13.197845170832, type: 'intl' },
-                { name: 'Motala Fontänhus', country: 'Sverige', lat: 58.538061863993, lng: 15.044861154186, type: 'intl' },
-                // ===================== SØR-AFRIKA =====================
-                { name: 'Fountain House/South Africa', country: 'Sør-Afrika', lat: -33.935353315405, lng: 18.467480306731, type: 'intl' },
-                // ===================== TAIWAN (REPUBLIC OF CHINA) =====================
-                { name: 'Becoming of the Light', country: 'Taiwan (Republic of China)', lat: 25.020842596433, lng: 121.501743291273, type: 'intl' },
-                { name: 'Easy Clubhouse', country: 'Taiwan (Republic of China)', lat: 25.033, lng: 121.5254, type: 'intl' },
-                { name: 'Eden Clubhouse', country: 'Taiwan (Republic of China)', lat: 25.033, lng: 121.5454, type: 'intl' },
-                { name: 'Xing Long Clubhouse', country: 'Taiwan (Republic of China)', lat: 25.033, lng: 121.4654, type: 'intl' },
-                // ===================== TYSKLAND =====================
-                { name: 'Clubhaus München Giesing', country: 'Tyskland', lat: 48.116325991282, lng: 11.57247503827, type: 'intl' },
-                { name: 'Clubhaus Schwalbennest', country: 'Tyskland', lat: 48.1351, lng: 11.552, type: 'intl' },
-                // ===================== USA =====================
-                { name: '1121 Rockingham Rd', country: 'USA', lat: 32.9673794, lng: -96.7451032, type: 'intl' },
-                { name: 'A Place of Our Own', country: 'USA', lat: 42.340151994648, lng: -83.070871961802, type: 'intl' },
-                { name: 'ACTS Clubhouse', country: 'USA', lat: 27.9506, lng: -82.4572, type: 'intl' },
-                { name: 'AIM Center, Inc.', country: 'USA', lat: 35.047488410514, lng: -85.318011252823, type: 'intl' },
-                { name: 'AOP Clubhouse', country: 'USA', lat: 34.508596157892, lng: -82.652798054112, type: 'intl' },
-                { name: 'Academy at Bradenton', country: 'USA', lat: 27.4989, lng: -82.5748, type: 'intl' },
-                { name: 'Academy at Glengary', country: 'USA', lat: 27.294789560742, lng: -82.531471765848, type: 'intl' },
-                { name: 'Access Hope House', country: 'USA', lat: 42.338139332057, lng: -83.18205388411, type: 'intl' },
-                { name: 'Adventure House', country: 'USA', lat: 39.7684, lng: -86.1581, type: 'intl' },
-                { name: 'Affinity House', country: 'USA', lat: 41.922499864326, lng: -85.511109011951, type: 'intl' },
-                { name: 'Alliance House', country: 'USA', lat: 40.7608, lng: -111.891, type: 'intl' },
-                { name: 'Alpha\'s House', country: 'USA', lat: 36.878901774473, lng: -76.223822075978, type: 'intl' },
-                { name: 'Anchor House', country: 'USA', lat: 41.658878699718, lng: -70.934076323609, type: 'intl' },
-                { name: 'Aspire House', country: 'USA', lat: 37.546606905547, lng: -122.307582731502, type: 'intl' },
-                { name: 'Atlantic Clubhouse', country: 'USA', lat: 42.249463783693, lng: -70.98861141642, type: 'intl' },
-                { name: 'Austin Clubhouse', country: 'USA', lat: 30.2672, lng: -97.7431, type: 'intl' },
-                { name: 'B\'More Clubhouse', country: 'USA', lat: 39.299622862274, lng: -76.612833410787, type: 'intl' },
-                { name: 'BPSR Escondido Clubhouse', country: 'USA', lat: 33.101002454339, lng: -117.073367842042, type: 'intl' },
-                { name: 'Baybridge Clubhouse', country: 'USA', lat: 41.65292524344, lng: -70.290492172488, type: 'intl' },
-                { name: 'Bayside Clubhouse', country: 'USA', lat: 43.435763906879, lng: -83.975429045255, type: 'intl' },
-                { name: 'Bellevue Clubhouse', country: 'USA', lat: 47.6101, lng: -122.2015, type: 'intl' },
-                { name: 'Berkshire Pathways', country: 'USA', lat: 42.443268598264, lng: -73.254811322901, type: 'intl' },
-                { name: 'Blue Water Clubhouse', country: 'USA', lat: 42.975048596493, lng: -82.427950567765, type: 'intl' },
-                { name: 'Breakthrough Clubhouse', country: 'USA', lat: 37.700514322007, lng: -97.337715726969, type: 'intl' },
-                { name: 'Bridge House', country: 'USA', lat: 41.3083, lng: -72.9279, type: 'intl' },
-                { name: 'Bridgeways Clubhouse', country: 'USA', lat: 48.050672010542, lng: -122.167195324864, type: 'intl' },
-                { name: 'Brighter House', country: 'USA', lat: 35.750245151925, lng: -81.68678916138, type: 'intl' },
-                { name: 'Broadway STARS Clubhouse', country: 'USA', lat: 41.02344548843, lng: -80.683169663271, type: 'intl' },
-                { name: 'Brooklyn Clubhouse', country: 'USA', lat: 40.6782, lng: -73.9442, type: 'intl' },
-                { name: 'Capital Clubhouse', country: 'USA', lat: 43.2081, lng: -71.5376, type: 'intl' },
-                { name: 'Capitol Clubhouse', country: 'USA', lat: 44.314155822766, lng: -69.76509813674, type: 'intl' },
-                { name: 'Carol Center Clubhouse', country: 'USA', lat: 41.528338562478, lng: -90.577409318917, type: 'intl' },
-                { name: 'Carriage House', country: 'USA', lat: 41.090975087644, lng: -85.09588687918, type: 'intl' },
-                { name: 'Casa del Centro Clubhouse', country: 'USA', lat: 32.706621462808, lng: -117.134327244542, type: 'intl' },
-                { name: 'Center Club', country: 'USA', lat: 42.3601, lng: -71.0589, type: 'intl' },
-                { name: 'Chadwick Clubhouse', country: 'USA', lat: 43.209514861558, lng: -123.340189952096, type: 'intl' },
-                { name: 'Charles Webster Potter Place', country: 'USA', lat: 42.374646208423, lng: -71.247243085526, type: 'intl' },
-                { name: 'Charlotte Clubhouse', country: 'USA', lat: 35.2271, lng: -80.8431, type: 'intl' },
-                { name: 'Charlotte\'s Place', country: 'USA', lat: 28.809154419605, lng: -81.257854821746, type: 'intl' },
-                { name: 'Charter House', country: 'USA', lat: 42.737563002267, lng: -84.560738990344, type: 'intl' },
-                { name: 'Chelton Loft', country: 'USA', lat: 40.786141823412, lng: -73.942386300276, type: 'intl' },
-                { name: 'Chobee Clubhouse', country: 'USA', lat: 27.255183894772, lng: -80.830397289633, type: 'intl' },
-                { name: 'Chrysalis Clubhouse', country: 'USA', lat: 43.086703886784, lng: -89.362460081169, type: 'intl' },
-                { name: 'Citiview Connections', country: 'USA', lat: 40.749442395455, lng: -73.936393950226, type: 'intl' },
-                { name: 'Club Cadillac', country: 'USA', lat: 44.270250575743, lng: -85.417135555957, type: 'intl' },
-                { name: 'Club Fellowship', country: 'USA', lat: 25.604524344953, lng: -80.350630311459, type: 'intl' },
-                { name: 'Club Horizon', country: 'USA', lat: 35.735330896329, lng: -78.645561355467, type: 'intl' },
-                { name: 'Club Interactions', country: 'USA', lat: 43.22561804821, lng: -86.243955235111, type: 'intl' },
-                { name: 'Club Nova', country: 'USA', lat: 35.9132, lng: -79.0558, type: 'intl' },
-                { name: 'Club Success Haines City', country: 'USA', lat: 28.085149302187, lng: -81.626019106072, type: 'intl' },
-                { name: 'Club Success Lakeland', country: 'USA', lat: 28.071655360084, lng: -81.953690667615, type: 'intl' },
-                { name: 'Clubhouse Atlanta', country: 'USA', lat: 33.749, lng: -84.388, type: 'intl' },
-                { name: 'Clubhouse Community of Hope', country: 'USA', lat: 33.570702431524, lng: -81.737079993699, type: 'intl' },
-                { name: 'Clubhouse El Dorado', country: 'USA', lat: 38.6824, lng: -120.8467, type: 'intl' },
-                { name: 'Clubhouse Inspiration', country: 'USA', lat: 42.3314, lng: -83.0458, type: 'intl' },
-                { name: 'Clubhouse Tulsa', country: 'USA', lat: 36.154, lng: -95.9928, type: 'intl' },
-                { name: 'Clubhouse for the Common Good', country: 'USA', lat: 42.472741130028, lng: -83.277836909181, type: 'intl' },
-                { name: 'Clubhouse of Lehigh County', country: 'USA', lat: 40.603858186213, lng: -75.490084353597, type: 'intl' },
-                { name: 'Commerce Park Clubhouse', country: 'USA', lat: 41.247189329587, lng: -76.98331193858, type: 'intl' },
-                { name: 'Community 43', country: 'USA', lat: 33.499872751301, lng: -112.047221126057, type: 'intl' },
-                { name: 'Compass Clubhouse', country: 'USA', lat: 42.584851934847, lng: -71.808954315171, type: 'intl' },
-                { name: 'Compass House, Inc.', country: 'USA', lat: 42.324634619208, lng: -122.877725066095, type: 'intl' },
-                { name: 'Connections Clubhouse', country: 'USA', lat: 35.639531987551, lng: -81.224266440246, type: 'intl' },
-                { name: 'Connections House', country: 'USA', lat: 37.980448388485, lng: -122.021615915942, type: 'intl' },
-                { name: 'Cora Dale House', country: 'USA', lat: 41.585649238706, lng: -85.832664550204, type: 'intl' },
-                { name: 'Cornerstone Clubhouse', country: 'USA', lat: 40.125905890076, lng: -75.534179786003, type: 'intl' },
-                { name: 'Cove Clubhouse', country: 'USA', lat: 41.670980575341, lng: -70.089030447457, type: 'intl' },
-                { name: 'Cowtown Clubhouse', country: 'USA', lat: 32.7555, lng: -97.3308, type: 'intl' },
-                { name: 'Crossroads Clubhouse', country: 'USA', lat: 42.136016693961, lng: -71.536138202779, type: 'intl' },
-                { name: 'Crossroads Clubhouse Warren', country: 'USA', lat: 42.49358218745, lng: -82.98776514036, type: 'intl' },
-                { name: 'Crystal House Clubhouse', country: 'USA', lat: 42.578058318504, lng: -71.993761869145, type: 'intl' },
-                { name: 'Deaf Community Services of San Diego Clubhouse', country: 'USA', lat: 32.660830539028, lng: -117.110518783848, type: 'intl' },
-                { name: 'Diamond Head Clubhouse', country: 'USA', lat: 21.269, lng: -157.821, type: 'intl' },
-                { name: 'Dreams Unlimited Clubhouse', country: 'USA', lat: 42.49748211936, lng: -83.158054064567, type: 'intl' },
-                { name: 'East Wind Clubhouse', country: 'USA', lat: 32.749427758506, lng: -117.081140716132, type: 'intl' },
-                { name: 'Elements House - Lower East Side', country: 'USA', lat: 40.712848953303, lng: -73.995546760967, type: 'intl' },
-                { name: 'Elev8 Clubhouse', country: 'USA', lat: 37.113019981008, lng: -113.594362285731, type: 'intl' },
-                { name: 'Elliot House', country: 'USA', lat: 42.304168651953, lng: -71.222300637151, type: 'intl' },
-                { name: 'Elm Brook Place', country: 'USA', lat: 42.497285354183, lng: -71.223899904277, type: 'intl' },
-                { name: 'Empowerment Clubhouse', country: 'USA', lat: 37.869196686833, lng: -122.51282427577, type: 'intl' },
-                { name: 'Everett Clubhouse', country: 'USA', lat: 47.992167667482, lng: -122.206696217045, type: 'intl' },
-                { name: 'Evergreen Club', country: 'USA', lat: 47.657021585692, lng: -117.379380314322, type: 'intl' },
-                { name: 'Fairwinds Rehabilitation Clubhouse', country: 'USA', lat: 41.552652326204, lng: -70.611277665296, type: 'intl' },
-                { name: 'Fern Street Clubhouse', country: 'USA', lat: 26.710789299901, lng: -80.061219120427, type: 'intl' },
-                { name: 'Foot Print to Success Clubhouse', country: 'USA', lat: 25.99534943979, lng: -80.251365192352, type: 'intl' },
-                { name: 'Forge Ahead Clubhouse', country: 'USA', lat: 39.787340452796, lng: -86.073382332024, type: 'intl' },
-                { name: 'Forum House', country: 'USA', lat: 42.117584134507, lng: -72.748619640595, type: 'intl' },
-                { name: 'Fountain House', country: 'USA', lat: 40.7605, lng: -73.9936, type: 'intl' },
-                { name: 'Fountain House Bronx', country: 'USA', lat: 40.8262, lng: -73.9235, type: 'intl' },
-                { name: 'Fountain House Hollywood', country: 'USA', lat: 34.0928, lng: -118.3287, type: 'intl' },
-                { name: 'Fresh Start Clubhouse', country: 'USA', lat: 42.246133863109, lng: -83.684536238985, type: 'intl' },
-                { name: 'Friends in Action Clubhouse', country: 'USA', lat: 37.787945870211, lng: -90.435244194435, type: 'intl' },
-                { name: 'Friendship Clubhouse', country: 'USA', lat: 42.5642952754, lng: -82.845110261275, type: 'intl' },
-                { name: 'Friendship Clubhouse - Community Counseling Center', country: 'USA', lat: 41.881559003089, lng: -80.743294982586, type: 'intl' },
-                { name: 'Frontier House', country: 'USA', lat: 40.416821297452, lng: -104.691354932585, type: 'intl' },
-                { name: 'Full Focus Training Center', country: 'USA', lat: 37.206919592436, lng: -77.382460682365, type: 'intl' },
-                { name: 'Gainesville Opportunity Center', country: 'USA', lat: 29.665080550902, lng: -82.337646541343, type: 'intl' },
-                { name: 'Gateway', country: 'USA', lat: 34.8526, lng: -82.394, type: 'intl' },
-                { name: 'Gathering Hope House', country: 'USA', lat: 41.420023502512, lng: -82.153607524072, type: 'intl' },
-                { name: 'Genesis Club, Inc.', country: 'USA', lat: 42.285169601573, lng: -71.791624478899, type: 'intl' },
-                { name: 'Genesis House', country: 'USA', lat: 42.601145306882, lng: -83.916930288038, type: 'intl' },
-                { name: 'Glades Clubhouse', country: 'USA', lat: 26.686263138748, lng: -80.679158000592, type: 'intl' },
-                { name: 'Grand Avenue Club', country: 'USA', lat: 43.0389, lng: -87.9065, type: 'intl' },
-                { name: 'Greater Heights Clubhouse', country: 'USA', lat: 40.685909726045, lng: -73.914888628719, type: 'intl' },
-                { name: 'Hale Oluea Clubhouse', country: 'USA', lat: 21.3959, lng: -157.7993, type: 'intl' },
-                { name: 'Hale o Honolulu', country: 'USA', lat: 21.3069, lng: -157.8583, type: 'intl' },
-                { name: 'Harbor Place Clubhouse', country: 'USA', lat: 42.461246942385, lng: -70.951307421062, type: 'intl' },
-                { name: 'Harlem Clubhouse', country: 'USA', lat: 40.8116, lng: -73.9565, type: 'intl' },
-                { name: 'Harmony Hall', country: 'USA', lat: 43.048467069421, lng: -83.304022393797, type: 'intl' },
-                { name: 'Harmony House', country: 'USA', lat: 36.578251121835, lng: -79.400260038395, type: 'intl' },
-                { name: 'Haverhill Clubhouse', country: 'USA', lat: 42.776632352162, lng: -71.084241974672, type: 'intl' },
-                { name: 'Heartland Clubhouse', country: 'USA', lat: 43.181055995254, lng: -85.252740031692, type: 'intl' },
-                { name: 'Hidden River Clubhouse', country: 'USA', lat: 40.677321167047, lng: -76.218222461742, type: 'intl' },
-                { name: 'High Hopes Clubhouse', country: 'USA', lat: 44.555083780808, lng: -69.630372538059, type: 'intl' },
-                { name: 'Hillsgrove House', country: 'USA', lat: 41.738912338269, lng: -71.428452875199, type: 'intl' },
-                { name: 'Hope Clubhouse of SW Florida', country: 'USA', lat: 26.610579582216, lng: -81.867907672128, type: 'intl' },
-                { name: 'Hope Community Center', country: 'USA', lat: 39.025744176016, lng: -84.21397848251, type: 'intl' },
-                { name: 'Hope Fort Bend Clubhouse', country: 'USA', lat: 29.576603863191, lng: -95.760839430504, type: 'intl' },
-                { name: 'Hope House', country: 'USA', lat: 41.001117271837, lng: -73.663225506276, type: 'intl' },
-                { name: 'Hope Springs Clubhouse', country: 'USA', lat: 40.313685499278, lng: -75.94861024802, type: 'intl' },
-                { name: 'Horizon House', country: 'USA', lat: 42.502999549035, lng: -71.066590860051, type: 'intl' },
-                { name: 'House of Dreams', country: 'USA', lat: 45.106878716083, lng: -87.605393485914, type: 'intl' },
-                { name: 'Hudson Valley Clubhouse', country: 'USA', lat: 41.701301900531, lng: -73.92486200385, type: 'intl' },
-                { name: 'Independence Center', country: 'USA', lat: 38.627, lng: -90.1994, type: 'intl' },
-                { name: 'Infinity House', country: 'USA', lat: 39.451357982797, lng: -87.39735196689, type: 'intl' },
-                { name: 'Integrity House', country: 'USA', lat: 33.763977342175, lng: -117.869229129455, type: 'intl' },
-                { name: 'Iris Clubhouse', country: 'USA', lat: 42.858865318289, lng: -106.322864138672, type: 'intl' },
-                { name: 'J-Town Clubhouse', country: 'USA', lat: 42.250305997324, lng: -84.422397019538, type: 'intl' },
-                { name: 'Job Connection Center', country: 'USA', lat: 40.692277667435, lng: -73.985860549838, type: 'intl' },
-                { name: 'Journey Center', country: 'USA', lat: 41.636696579697, lng: -80.1484853775, type: 'intl' },
-                { name: 'Journey House', country: 'USA', lat: 41.088675015149, lng: -111.997202972993, type: 'intl' },
-                { name: 'Kate\'s Place', country: 'USA', lat: 28.599065956007, lng: -81.400311636459, type: 'intl' },
-                { name: 'Katie\'s Place Clubhouse', country: 'USA', lat: 41.41048301077, lng: -75.665893012502, type: 'intl' },
-                { name: 'Kauhale Lahilahi, The Makaha Clubhouse', country: 'USA', lat: 21.460807924839, lng: -158.206893996432, type: 'intl' },
-                { name: 'Kenmore Club', country: 'USA', lat: 38.298181024519, lng: -77.462648086931, type: 'intl' },
-                { name: 'Lakeside Clubhouse', country: 'USA', lat: 42.7325, lng: -84.5555, type: 'intl' },
-                { name: 'Lantern House', country: 'USA', lat: 40.811462505167, lng: -73.904843420677, type: 'intl' },
-                { name: 'Legacy Center', country: 'USA', lat: 43.019646649724, lng: -83.654319142762, type: 'intl' },
-                { name: 'Lexington Clubhouse', country: 'USA', lat: 40.518829101007, lng: -78.39973756969, type: 'intl' },
-                { name: 'Lexington House of Elkhart IN', country: 'USA', lat: 41.65917713738, lng: -85.971217158237, type: 'intl' },
-                { name: 'Liberty Centre', country: 'USA', lat: 42.032043920845, lng: -97.393051878267, type: 'intl' },
-                { name: 'Light of Hope Clubhouse', country: 'USA', lat: 45.061731061461, lng: -83.436148680484, type: 'intl' },
-                { name: 'Lighthouse', country: 'USA', lat: 42.119736732971, lng: -72.54562855351, type: 'intl' },
-                { name: 'Looking Ahead Clubhouse', country: 'USA', lat: 44.1181639182, lng: -70.205125757589, type: 'intl' },
-                { name: 'Magnolia Clubhouse', country: 'USA', lat: 30.4515, lng: -84.2807, type: 'intl' },
-                { name: 'Mariposa Clubhouse', country: 'USA', lat: 33.202643675358, lng: -117.36643513542, type: 'intl' },
-                { name: 'Mid City Clubhouse New Orleans', country: 'USA', lat: 29.977245214385, lng: -90.104018035393, type: 'intl' },
-                { name: 'Milestone Clubhouse', country: 'USA', lat: 38.055135965373, lng: -97.931398971906, type: 'intl' },
-                { name: 'Miracle Clubhouse', country: 'USA', lat: 39.750046012807, lng: -84.186980959115, type: 'intl' },
-                { name: 'Mosaic House', country: 'USA', lat: 40.333785261183, lng: -75.926843032207, type: 'intl' },
-                { name: 'NAMI East Corner Clubhouse', country: 'USA', lat: 32.781069987817, lng: -116.96680200145, type: 'intl' },
-                { name: 'NAMI San Diego Connection 2 Community Clubhouse', country: 'USA', lat: 32.712976076972, lng: -117.161500955541, type: 'intl' },
-                { name: 'Neponset River House', country: 'USA', lat: 42.17793559757, lng: -71.200443399698, type: 'intl' },
-                { name: 'New Beginnings Clubhouse', country: 'USA', lat: 41.474310993903, lng: -87.337968026911, type: 'intl' },
-                { name: 'New Directions Clubhouse', country: 'USA', lat: 42.414463313636, lng: -83.28155336328, type: 'intl' },
-                { name: 'New Hope Clubhouse', country: 'USA', lat: 41.440867996514, lng: -85.268004986117, type: 'intl' },
-                { name: 'New Horizons Clubhouse', country: 'USA', lat: 44.818562243515, lng: -85.281939481051, type: 'intl' },
-                { name: 'New Journey Club', country: 'USA', lat: 43.696572544843, lng: -85.469018530785, type: 'intl' },
-                { name: 'New Reflection House', country: 'USA', lat: 40.513817016275, lng: -112.311592722457, type: 'intl' },
-                { name: 'NorthStar Clubhouse', country: 'USA', lat: 45.52633178212, lng: -122.606083761252, type: 'intl' },
-                { name: 'Northern Lights Clubhouse', country: 'USA', lat: 47.126632312837, lng: -88.580902176248, type: 'intl' },
-                { name: 'Oasis Clubhouse', country: 'USA', lat: 32.712050295766, lng: -117.122491661982, type: 'intl' },
-                { name: 'Oasis House', country: 'USA', lat: 39.953519310781, lng: -76.717377536333, type: 'intl' },
-                { name: 'Odyssey House', country: 'USA', lat: 42.208472966314, lng: -72.617541259442, type: 'intl' },
-                { name: 'Open Door Clubhouse', country: 'USA', lat: 39.993530451317, lng: -75.112260596413, type: 'intl' },
-                { name: 'Open Door Social Club', country: 'USA', lat: 39.761640406103, lng: -86.405695791545, type: 'intl' },
-                { name: 'Opportunity Center', country: 'USA', lat: 43.602950583959, lng: -83.884105414098, type: 'intl' },
-                { name: 'Opportunity Centre', country: 'USA', lat: 40.828687064736, lng: -77.808285587378, type: 'intl' },
-                { name: 'Options Clubhouse', country: 'USA', lat: 42.32821323086, lng: -71.543196435805, type: 'intl' },
-                { name: 'Ora Clubhouse', country: 'USA', lat: 29.192610606175, lng: -82.096212525897, type: 'intl' },
-                { name: 'Our Clubhouse', country: 'USA', lat: 42.068560729767, lng: -71.046464988518, type: 'intl' },
-                { name: 'Our House Clubhouse', country: 'USA', lat: 42.495630808405, lng: -83.300841461542, type: 'intl' },
-                { name: 'Our Place of Hope Clubhouse', country: 'USA', lat: 34.041135, lng: -81.098518, type: 'intl' },
-                { name: 'Outlook', country: 'USA', lat: 41.942605577383, lng: -85.003717460206, type: 'intl' },
-                { name: 'PHA Clubhouse', country: 'USA', lat: 47.216983990379, lng: -122.408024166901, type: 'intl' },
-                { name: 'Pathfinder Clubhouse', country: 'USA', lat: 44.565641626048, lng: -123.258233882141, type: 'intl' },
-                { name: 'Pathway Clubhouse', country: 'USA', lat: 39.96560161466, lng: -82.968418702003, type: 'intl' },
-                { name: 'Pathway to Hope Clubhouse', country: 'USA', lat: 38.885053134935, lng: -94.780060283272, type: 'intl' },
-                { name: 'Petoskey Club', country: 'USA', lat: 45.371867597742, lng: -84.969607305233, type: 'intl' },
-                { name: 'Phoenix House', country: 'USA', lat: 32.457956421402, lng: -99.737507579726, type: 'intl' },
-                { name: 'Plymouth Bay House', country: 'USA', lat: 41.975151082489, lng: -70.68679140447, type: 'intl' },
-                { name: 'Point After Club', country: 'USA', lat: 42.707943074735, lng: -71.152924714216, type: 'intl' },
-                { name: 'Polaris House', country: 'USA', lat: 64.8378, lng: -147.7164, type: 'intl' },
-                { name: 'Queen City Clubhouse', country: 'USA', lat: 39.129610373233, lng: -84.479282900914, type: 'intl' },
-                { name: 'Railway Clubhouse', country: 'USA', lat: 38.047625528671, lng: -97.347424988331, type: 'intl' },
-                { name: 'Rainbow Club', country: 'USA', lat: 40.825537145522, lng: -73.947163063077, type: 'intl' },
-                { name: 'Renaissance Club', country: 'USA', lat: 42.641708018557, lng: -71.330010020793, type: 'intl' },
-                { name: 'Resilience Clubhouse', country: 'USA', lat: 38.833815189467, lng: -97.623052893962, type: 'intl' },
-                { name: 'River Raisin Clubhouse', country: 'USA', lat: 41.92711879589, lng: -83.414367215435, type: 'intl' },
-                { name: 'Robbie\'s House', country: 'USA', lat: 41.308954149163, lng: -105.59307311922, type: 'intl' },
-                { name: 'Salamander House', country: 'USA', lat: 47.611505216264, lng: -122.623301459356, type: 'intl' },
-                { name: 'Salem Connection', country: 'USA', lat: 42.522531562728, lng: -70.911091468721, type: 'intl' },
-                { name: 'Sally and Howard Levin Clubhouse', country: 'USA', lat: 40.42937730459, lng: -79.923325413802, type: 'intl' },
-                { name: 'San Angelo Clubhouse', country: 'USA', lat: 31.457502558575, lng: -100.436170473898, type: 'intl' },
-                { name: 'San Antonio Clubhouse', country: 'USA', lat: 29.4241, lng: -98.4936, type: 'intl' },
-                { name: 'Sanctuary House', country: 'USA', lat: 36.079661364704, lng: -79.789424342937, type: 'intl' },
-                { name: 'Sand Creek Connections', country: 'USA', lat: 48.277734917718, lng: -116.552221754823, type: 'intl' },
-                { name: 'Seattle Clubhouse', country: 'USA', lat: 47.6062, lng: -122.3321, type: 'intl' },
-                { name: 'Sheldon Clubhouse', country: 'USA', lat: 42.959293216914, lng: -85.667216761814, type: 'intl' },
-                { name: 'Shore House', country: 'USA', lat: 40.2206, lng: -74.0121, type: 'intl' },
-                { name: 'Side by Side Brain Injury Clubhouse', country: 'USA', lat: 33.809341333718, lng: -84.170436674808, type: 'intl' },
-                { name: 'Skagit Clubhouse', country: 'USA', lat: 48.441575937179, lng: -122.336978485033, type: 'intl' },
-                { name: 'Smith County Clubhouse', country: 'USA', lat: 32.330260222, lng: -95.301267139288, type: 'intl' },
-                { name: 'South Shore Place', country: 'USA', lat: 46.525072048663, lng: -87.403895551061, type: 'intl' },
-                { name: 'Spirit Crossing Clubhouse', country: 'USA', lat: 40.57447035358, lng: -105.055862779289, type: 'intl' },
-                { name: 'Spring City Corner Clubhouse', country: 'USA', lat: 43.009446292654, lng: -88.231169697005, type: 'intl' },
-                { name: 'Square One Clubhouse', country: 'USA', lat: 40.597367743308, lng: -77.573767480242, type: 'intl' },
-                { name: 'St. Joseph House', country: 'USA', lat: 29.738475344953, lng: -95.374109817377, type: 'intl' },
-                { name: 'Star Light Clubhouse', country: 'USA', lat: 42.330337833767, lng: -72.675194336416, type: 'intl' },
-                { name: 'Stepping Stones Clubhouse', country: 'USA', lat: 39.987246287049, lng: -75.800669237878, type: 'intl' },
-                { name: 'Summit County Clubhouse', country: 'USA', lat: 40.722773797215, lng: -111.492249617117, type: 'intl' },
-                { name: 'TOP Clubhouse', country: 'USA', lat: 40.788800060185, lng: -73.977266333055, type: 'intl' },
-                { name: 'Tempo Clubhouse', country: 'USA', lat: 40.052464241186, lng: -76.251563828556, type: 'intl' },
-                { name: 'The Clubhouse at Miller Beach', country: 'USA', lat: 41.600237941183, lng: -87.265756673769, type: 'intl' },
-                { name: 'The Clubhouse of St. Joseph County.', country: 'USA', lat: 41.663872930996, lng: -86.233142999109, type: 'intl' },
-                { name: 'The Gathering Place Clubhouse', country: 'USA', lat: 42.370682280683, lng: -83.279593756087, type: 'intl' },
-                { name: 'The Key Clubhouse Kendall', country: 'USA', lat: 25.682927284242, lng: -80.417057983771, type: 'intl' },
-                { name: 'The Key Clubhouse of South Florida', country: 'USA', lat: 25.85014214546, lng: -80.241438839697, type: 'intl' },
-                { name: 'The Lotus House', country: 'USA', lat: 39.043653117979, lng: -95.680114578307, type: 'intl' },
-                { name: 'The Meeting Place', country: 'USA', lat: 32.731714994987, lng: -117.169385895678, type: 'intl' },
-                { name: 'The NIA Foundation Project Safe Spaces', country: 'USA', lat: 33.987819461146, lng: -118.353965570384, type: 'intl' },
-                { name: 'The Plaza', country: 'USA', lat: 32.650254505058, lng: -117.090726009147, type: 'intl' },
-                { name: 'The Summit Clubhouse', country: 'USA', lat: 43.596418399176, lng: -84.805215133729, type: 'intl' },
-                { name: 'Threshold', country: 'USA', lat: 35.991574686948, lng: -78.870376236211, type: 'intl' },
-                { name: 'Thunderbird Clubhouse', country: 'USA', lat: 35.214643592581, lng: -97.42165277592, type: 'intl' },
-                { name: 'Towne House Clubhouse', country: 'USA', lat: 41.712894785084, lng: -71.127312719416, type: 'intl' },
-                { name: 'Tradewinds', country: 'USA', lat: 42.075065715273, lng: -72.034457098709, type: 'intl' },
-                { name: 'Traverse House', country: 'USA', lat: 44.764879171161, lng: -85.628304446874, type: 'intl' },
-                { name: 'Turning Point Clubhouse', country: 'USA', lat: 42.252315977706, lng: -83.174583764362, type: 'intl' },
-                { name: 'Union Station Clubhouse', country: 'USA', lat: 39.901747479989, lng: -79.728967854627, type: 'intl' },
-                { name: 'Unity House', country: 'USA', lat: 38.824864238885, lng: -104.842285851409, type: 'intl' },
-                { name: 'Unlimited Solutions Clubhouse', country: 'USA', lat: 44.79695616979, lng: -68.771857697876, type: 'intl' },
-                { name: 'Vail Hopkins Clubhouse', country: 'USA', lat: 44.923444243578, lng: -93.411120145307, type: 'intl' },
-                { name: 'Vail Ramsey County Clubhouse', country: 'USA', lat: 44.949923639628, lng: -93.126466606337, type: 'intl' },
-                { name: 'Vail Uptown Clubhouse', country: 'USA', lat: 44.937973224995, lng: -93.297841322281, type: 'intl' },
-                { name: 'Venture House Queens', country: 'USA', lat: 40.7282, lng: -73.7949, type: 'intl' },
-                { name: 'Venture House Staten Island', country: 'USA', lat: 40.5795, lng: -74.1502, type: 'intl' },
-                { name: 'Village Clubhouse', country: 'USA', lat: 43.939771831008, lng: -69.967082557253, type: 'intl' },
-                { name: 'Vincent House', country: 'USA', lat: 27.843324773872, lng: -82.699163054442, type: 'intl' },
-                { name: 'Vincent House Hernando', country: 'USA', lat: 28.49168422096, lng: -82.594011492373, type: 'intl' },
-                { name: 'Vincent House Pasco', country: 'USA', lat: 28.390709067877, lng: -82.629756705197, type: 'intl' },
-                { name: 'Visions Clubhouse', country: 'USA', lat: 42.640461797193, lng: -83.315954954976, type: 'intl' },
-                { name: 'Wabash Valley Friendship Clubhouse', country: 'USA', lat: 38.674452327506, lng: -87.533953938416, type: 'intl' },
-                { name: 'Waipahu Aloha Clubhouse', country: 'USA', lat: 21.3864, lng: -158.0099, type: 'intl' },
-                { name: 'Wasatch House', country: 'USA', lat: 40.225913520076, lng: -111.64793575725, type: 'intl' },
-                { name: 'Water\'s Edge Clubhouse', country: 'USA', lat: 46.500796422596, lng: -84.345246127036, type: 'intl' },
-                { name: 'Webster House Clubhouse', country: 'USA', lat: 42.286939985252, lng: -71.129320017588, type: 'intl' },
-                { name: 'Wellspring Clubhouse', country: 'USA', lat: 40.347775705321, lng: -75.304251106132, type: 'intl' },
-                { name: 'West Place Clubhouse', country: 'USA', lat: 40.307158720823, lng: -79.521928475947, type: 'intl' },
-                { name: 'Westside Clubhouse', country: 'USA', lat: 37.772714275761, lng: -122.414674620337, type: 'intl' },
-                { name: 'Whatcom Clubhouse', country: 'USA', lat: 48.753564706423, lng: -122.456855961334, type: 'intl' },
-                { name: 'Workabilities Clubhouse', country: 'USA', lat: 40.864313547902, lng: -76.787462233001, type: 'intl' },
-                { name: 'Yahara House', country: 'USA', lat: 43.0731, lng: -89.4012, type: 'intl' },
-                // ===================== UGANDA =====================
-                { name: 'Fountain House/Kampala', country: 'Uganda', lat: 0.3156879, lng: 32.5781139, type: 'intl' },
-            ];
-
-            // ============================================================
-            //  WEBSITE URLS — mapped by clubhouse name
-            //  Source: From official Clubhouse International directory listings
-            // ============================================================
-            var urlMap = {
-                // ARGENTINA
-                'Casaclub Baires': 'https://www.casaclub.org.ar/',
-                // AUSTRALIA
-                'Diamond House Clubhouse': 'http://www.clubhouse.org.au',
-                'Kindred Clubhouse': 'http://www.kindredclubhouse.org.au',
-                'Stepping Stone Clubhouse': 'http://www.steppingstoneclubhouse.org.au',
-                'Stepping Stone North': 'http://www.steppingstoneclubhouse.org.au',
-                'The Junction Clubhouse': 'http://www.thejunctioncairns.com',
-                // CANADA
-                'Beyond the Heart Clubhouse': 'http://www.beyondtheheartclubhouse.ca',
-                'Connections Place': 'http://www.connectionsplace.org',
-                'Oak Centre': 'http://www.oakcentre.ca',
-                'Pathways Clubhouse Society of Richmond': 'http://www.pathwaysclubhouse.com',
-                'Potential Place': 'http://www.potentialplace.org',
-                'Progress Place': 'https://www.progressplace.org',
-                'UP House': 'https://www.uphouse.org/',
-                // DENMARK
-                'Fountain House Copenhagen': 'http://www.fountainhousecph.dk',
-                'Kildehuset Fountain House/Aalborg': 'http://www.kildehuset-fountainhouse.dk',
-                // ESTONIA
-                'Haabersti Klubimaja': 'http://klubimaja.ee',
-                // FINLAND
-                'Helsingin Klubitalo': 'http://www.helsinginklubitalo.org',
-                'Klubbhus Fontana': 'http://www.klubbhusfontana.fi',
-                'Klubbhuset Pelaren': 'http://www.klubbhusetpelaren.com',
-                'Näsinkulman Klubitalo': 'http://www.sopimusvuori.fi/nasinkulma/',
-                'Suvimäen Klubitalo': 'http://www.suvimaenklubitalo.fi',
-                'Tuusulanjärven Klubitalo': 'http://www.tuusulanjarvenklubitalo.eskot.org',
-                'Walonkulman Klubitalo': 'https://www.sopimusvuori.fi/walonkulma/',
-                // FRANCE
-                'Clubhouse Bastia': 'https://www.clubhousefrance.org/',
-                'Clubhouse Bordeaux': 'http://www.clubhousefrance.org',
-                'Clubhouse Lyon': 'http://www.clubhousefrance.org',
-                'Clubhouse Marseille': 'https://www.clubhousefrance.org/',
-                'Clubhouse Nantes': 'https://www.clubhousefrance.org/nos-clubhouses/clubhouse-nantes/',
-                'Clubhouse Paris': 'http://www.clubhousefrance.org',
-                'Clubhouse Rennes': 'https://www.clubhousefrance.org/',
-                'Clubhouse Rouen': 'https://www.clubhousefrance.org/',
-                'Clubhouse de Lille': 'https://www.clubhousefrance.org/nos-clubhouses/clubhouse-lille/',
-                // GHANA
-                'Clubhouse Ghana': 'http://www.ml4lyfe.com/clubhouse-ghana',
-                // GIBRALTAR
-                'Clubhouse Gibraltar': 'http://www.clubhousegibraltar.com',
-                // INDIA
-                'SEVAC Clubhouse of India': 'http://www.sevacmentalhealthcare.org',
-                // ISLAND
-                'Klúbburinn Geysir': 'http://www.klubburinngeysir.is',
-                // ISRAEL
-                'Clubhouse Afula': 'https://clubhouseamit.org.il/clubhouse-afula/?lang=en',
-                'Jerusalem Clubhouse': 'https://clubhouseamit.org.il/clubhouse-jerusalem',
-                // ITALY
-                'Club Itaca Milano': 'http://www.progettoitaca.org',
-                'Club Itaca Roma': 'https://www.progettoitacaroma.org/',
-                // JAPAN
-                'Clubhouse Habataki': 'http://ch-habataki.com/',
-                'Clubhouse Yuusen': 'https://shinsenkai.net/index.html',
-                'Sun Marina': 'http://www.jhcitabashi.com/sunmarina/',
-                // MEXICO
-                'Guadalajara Clubhouse A.C.': 'http://guadalajaraclubhouse.org.mx',
-                // NEDERLAND
-                'Clubhouse De Waterheuvel': 'http://www.waterheuvel.nl',
-                // NORGE
-                'Fontenehuset Arendal': 'https://fontenehusetarendal.no',
-                'Fontenehuset Asker': 'http://www.fontenehuset-asker.no',
-                'Fontenehuset Bergen': 'https://www.fontenehusetbergen.no/',
-                'Fontenehuset Drammen': 'http://www.fontenehuset-drammen.no',
-                'Fontenehuset Fredrikstad': 'http://www.fontenehusetfredrikstad.no',
-                'Fontenehuset Gjøvik': 'http://www.fontenehusetgjovik.no',
-                'Fontenehuset Harstad': 'http://www.fontenehusetharstad.no',
-                'Fontenehuset Hønefoss': 'http://www.fontenehuset.com',
-                'Fontenehuset Kongsberg': 'http://www.fontenehusetkongsberg.no',
-                'Fontenehuset Oslo Sør': 'https://fontenehuset-mortensrud.no/',
-                'Fontenehuset Oslo sentrum': 'http://www.fontenehuset.no',
-                'Fontenehuset Oslo Øst': 'http://www.fontenehuset-osloost.no',
-                'Fontenehuset Rygge': 'https://www.fontenehuset-rygge.no/',
-                'Fontenehuset Senja': 'https://www.fontenehusetsenja.no/',
-                'Fontenehuset Stavanger': 'http://www.fontenehuset.org',
-                'Fontenehuset Trondheim': 'http://www.fontenehuset-trondheim.no',
-                'Fontenehuset Ullensaker': 'http://fontenehuset-ullensaker.no',
-                'Fontenehuset i Tromsø': 'https://www.fontenehuset-tromso.no/',
-                'Fontenehuset Ålesund': 'https://www.fontenehuset-alesund.no/',
-                'Stiftelsen Fontenehuset Baerum': 'https://fontenehuset-baerum.no',
-                'Stiftelsen Fontenehuset Nordre Follo': 'http://www.fontenehuset-nordrefollo.org',
-                // POLEN
-                'Warszawski Dom pod Fontanną': 'http://www.wdpf.org.pl',
-                // REPUBLIC OF IRELAND
-                'Cairdeas Clubhouse': 'http://eve.ie',
-                'Conai Clubhouse': 'https://www.eve.ie/page/327',
-                'Platinum Clubhouse': 'https://www.eve.ie/page/331',
-                'Rainbow Clubhouse': 'https://www.eve.ie/page/332',
-                'Saol Clubhouse': 'https://www.eve.ie/page/329',
-                'Suaimhneas Clubhouse': 'https://suaimhneasclubhouse.wordpress.com/',
-                // REPUBLIC OF KOREA
-                'Besor Ravine': 'https://www.besorravine.co.kr/',
-                'Chamsari': 'http://www.chamsari.or.kr',
-                'Clubhouse Happy Together': 'http://www.clubhappy.or.kr',
-                'Life-nest': 'http://www.life-nest.co.kr',
-                'NulPooRum': 'http://www.nulpoorum.org',
-                'Song-guk Clubhouse': 'https://youtu.be/ZY0ktDs6MDc',
-                'Taiwha Fountain House': 'https://fountainhouse.or.kr',
-                // REPUBLIC OF KOSOVO
-                'Klubi Deshira': 'https://www.facebook.com/KlubiDeshiraClubhouse/',
-                // STORBRITANNIA
-                'Mosaic Clubhouse': 'http://www.mosaic-clubhouse.org',
-                // SVERIGE
-                'Falkenberg Fontänhus': 'https://www.falkenbergsfontanhus.se/',
-                'Fontänhuset B├Ñstad': 'http://www.fhb.nu',
-                'Fontänhuset Falun': 'https://www.fontanhusetfalun.se/',
-                'Fontänhuset G├Âteborg': 'http://www.goteborgsfontanen.se',
-                'Fontänhuset Helsingborg': 'http://www.fontanhushbg.se',
-                'Fontänhuset Malm├Â': 'http://www.fontanhuset.se',
-                'Fontänhuset Nyk├Âping': 'http://www.fontan.se',
-                'Fontänhuset Sk├Ândal': 'http://www.fhskondal.se',
-                'Fontänhuset Varberg': 'https://www.fontanhusetvarberg.se/',
-                'Fontänhuset ├älmhult': 'http://www.fontanhusettrappan.wordpress.com',
-                'Fontänhuset ├ûrebro': 'http://www.orebrofontanhus.se',
-                'Fountain House/Stockholm': 'https://www.fountainhouse.se/',
-                'Lunds Fontänhus': 'http://www.lundsfontanhus.se',
-                'Motala Fontänhus': 'http://www.motalafontanhus.se',
-                // TAIWAN (REPUBLIC OF CHINA)
-                'Becoming of the Light': 'http://www.facebook.com/becoming.light.clubhouse',
-                'Easy Clubhouse': 'https://zh-tw.facebook.com/cihfang/',
-                'Eden Clubhouse': 'http://www.facebook.com/edenclubhouse2012',
-                'Xing Long Clubhouse': 'https://facebook.com/freshleafclub',
-                // TYSKLAND
-                'Clubhaus München Giesing': 'https://www.spzmuc.de/clubhaeuser',
-                'Clubhaus Schwalbennest': 'https://www.spzmuc.de/clubhaeuser',
-                // USA
-                'ACTS Clubhouse': 'https://www.actsfl.org/',
-                'AIM Center, Inc.': 'http://www.aimcenterinc.org',
-                'AOP Clubhouse': 'https://www.aopclubhouse.org/',
-                'Academy at Bradenton': 'http://www.AcademySRQ.org',
-                'Academy at Glengary': 'http://www.AcademySRQ.org',
-                'Adventure House': 'http://www.adventurehouse.org',
-                'Alliance House': 'http://www.alliancehouse.org',
-                'Alpha\'s House': 'https://www.alphacommunityservices.com/',
-                'Anchor House': 'https://www.elwyn.org/services/clubhouses',
-                'Aspire House': 'https://aspireclubhouse.org',
-                'Atlantic Clubhouse': 'http:www.vinfenclubhouses.org/atlantic/',
-                'Austin Clubhouse': 'http://www.austinclubhouse.org',
-                'B\'More Clubhouse': 'http://www.bmoreclubhouse.org',
-                'BPSR Escondido Clubhouse': 'https://turnbhs.org/location/escondido-clubhouse/',
-                'Baybridge Clubhouse': 'https://vinfenclubhouses.org/baybridge/',
-                'Bayside Clubhouse': 'http://www.ttiinc.org',
-                'Bellevue Clubhouse': 'http://www.bellevueclubhouse.org',
-                'Berkshire Pathways': 'https://viability.org/',
-                'Blue Water Clubhouse': 'http://www.touchstoneservices.org',
-                'Breakthrough Clubhouse': 'https://www.breakthroughwichita.org/breakthrough-clubhouse/',
-                'Bridge House': 'http://www.bridgehousect.org',
-                'Bridgeways Clubhouse': 'https://bridgeways.org/bridgeways-clubhouse/',
-                'Brighter House': 'https://www.brighterhouse.org/',
-                'Broadway STARS Clubhouse': 'https://broadwayrecoveryservices.org/clubhouse',
-                'Brooklyn Clubhouse': 'https://sus.org/',
-                'Capital Clubhouse': 'http://www.capitalclubhouseinc.org',
-                'Capitol Clubhouse': 'http://www.capitolclubhouse.org',
-                'Carol Center Clubhouse': 'https://sites.google.com/view/carolcenterclubhouse/home',
-                'Carriage House': 'http://www.fortwayneclubhouse.org',
-                'Casa del Centro Clubhouse': 'https://namisandiego.org/clubhouses/casa-del-centro/',
-                'Center Club': 'http://www.centerclubboston.org',
-                'Chadwick Clubhouse': 'http://www.chadwickclubhouse.com',
-                'Charles Webster Potter Place': 'http://www.edinburgcenter.org/charles-webster-potter-place/',
-                'Charlotte Clubhouse': 'https://www.charlotteclubhouse.org/',
-                'Charlotte\'s Place': 'N/A',
-                'Charter House': 'http://www.charterhousemi.org',
-                'Chobee Clubhouse': 'http://www.mhairc.org',
-                'Club Fellowship': 'http://www.clubfellowship.org',
-                'Club Horizon': 'http://www.clubhorizon.org',
-                'Club Interactions': 'http://www.clubinteractions.org',
-                'Club Nova': 'http://www.clubnova.org',
-                'Club Success Haines City': 'https://www.peacerivercenter.org/',
-                'Club Success Lakeland': 'https://m.facebook.com/ClubSuccess2005',
-                'Clubhouse Atlanta': 'https://www.clubhouseatlanta.org/',
-                'Clubhouse Community of Hope': 'https://overflow.foundation/',
-                'Clubhouse El Dorado': 'https://namieldoradocounty.org/support-and-education/clubhouse-el-dorado/',
-                'Clubhouse Inspiration': 'http://www.ttiinc.org',
-                'Clubhouse Tulsa': 'http://www.clubhousetulsa.org',
-                'Clubhouse of Lehigh County': 'http://www.clubhouseoflehighcounty.org',
-                'Commerce Park Clubhouse': 'http://www.csg.org',
-                'Community 43': 'https://community43.org/',
-                'Compass Clubhouse': 'https://www.compassclubhouse.org/',
-                'Compass House, Inc.': 'http://www.socompasshouse.org',
-                'Connections House': 'http://www.connectionshouseca.org',
-                'Cora Dale House': 'http://www.ecclubhouse.org',
-                'Cornerstone Clubhouse': 'https://ccphoenixvillepa.wixsite.com/cornerstoneclubhouse',
-                'Cove Clubhouse': 'http://www.coveclubhouse.org',
-                'Cowtown Clubhouse': 'http://www.cowtownclubhouse.org',
-                'Crossroads Clubhouse': 'http://www.crossroadsclubhouse.org',
-                'Crystal House Clubhouse': 'https://openskycs.org/services/mental-health-services/adult-services.html',
-                'Deaf Community Services of San Diego Clubhouse': 'https://deafcommunityservices.org/',
-                'Dreams Unlimited Clubhouse': 'http://www.duc.essmichigan.org',
-                'East Wind Clubhouse': 'https://www.upacsd.com/',
-                'Elements House - Lower East Side': 'https://www.nydis.org/elementshouse/',
-                'Elev8 Clubhouse': 'http://www.elev8clubhouse.org',
-                'Elliot House': 'http://www.elliothouse.org',
-                'Elm Brook Place': 'http://www.elmbrookplace.org',
-                'Empowerment Clubhouse': 'http://www.marincitycdc.org',
-                'Everett Clubhouse': 'http://www.everettclubhouse.org',
-                'Fairwinds Rehabilitation Clubhouse': 'https://www.facebook.com/fairwindsclubhouse/',
-                'Fern Street Clubhouse': 'http://www.mentalhealthpbc.org',
-                'Foot Print to Success Clubhouse': 'http://www.footprintsuccess.org',
-                'Forge Ahead Clubhouse': 'http://eCommunity.com/forgeahead',
-                'Fountain House': 'https://www.fountainhouse.org/',
-                'Fountain House Bronx': 'https://www.fountainhouse.org/services/bronx',
-                'Fountain House Hollywood': 'https://www.fountainhouse.org/services/hollywood',
-                'Fresh Start Clubhouse': 'http://www.freshstartclubhouse.org',
-                'Friends in Action Clubhouse': 'https://www.bjcbehavioralhealth.org/Friends-in-Action-Clubhouse',
-                'Friendship Clubhouse': 'http://www.hopenetwork.org',
-                'Friendship Clubhouse - Community Counseling Center': 'https://cccohio.com/',
-                'Frontier House': 'http://www.frontierhouse.org',
-                'Full Focus Training Center': 'https://www.fullfocustc.com/',
-                'Gainesville Opportunity Center': 'http://www.goclubhouse.org',
-                'Gateway': 'http://www.gateway-sc.org',
-                'Gathering Hope House': 'https://www.gatheringhopehouse.org',
-                'Genesis Club, Inc.': 'https://genesisclub.org/',
-                'Genesis House': 'http://www.genesisliv.org',
-                'Glades Clubhouse': 'https://mhapalmbeaches.org/',
-                'Grand Avenue Club': 'https://grandavenueclub.org/',
-                'Greater Heights Clubhouse': 'https://wearebcs.org/',
-                'Harbor Place Clubhouse': 'https://harbor-place.org/',
-                'Harlem Clubhouse': 'https://phoenixhouseny.org/our-programs/clubhouse/',
-                'Harmony House': 'https://www.dpcs.org/',
-                'Haverhill Clubhouse': 'https://www.vinfenclubhouses.org/haverhill',
-                'Hidden River Clubhouse': 'http://www.csgonline.org',
-                'High Hopes Clubhouse': 'http://www.highhopesclubhouse.org',
-                'Hillsgrove House': 'http://hillsgroveclubhouse.org',
-                'Hope Clubhouse of SW Florida': 'https://hopeclubhouse.org/',
-                'Hope Community Center': 'https://hopecenteramelia.com/',
-                'Hope Fort Bend Clubhouse': 'http://www.hopefortbendclubhouse.org',
-                'Hope House': 'https://www.hdsw.org/',
-                'Hope Springs Clubhouse': 'https://hopespringsclubhouse.ju.mp/',
-                'Hudson Valley Clubhouse': 'https://www.hvclubhouse.org/',
-                'Independence Center': 'https://independencecenter.org',
-                'Integrity House': 'http://www.allianceofabilities.org',
-                'Iris Clubhouse': 'https://www.irisclubhouse.org/',
-                'J-Town Clubhouse': 'http://hopenetwork.org/jtown',
-                'Journey Center': 'https://chapsinc.org/',
-                'Journey House': 'https://www.journeyhouseclub.org/',
-                'Kate\'s Place': 'N/A',
-                'Katie\'s Place Clubhouse': 'https://www.katiesplaceclubhouse.org/',
-                'Kauhale Lahilahi, The Makaha Clubhouse': 'http://www.makahaclubhouse.info',
-                'Kenmore Club': 'https://rappahannockareacsb.org/',
-                'Lakeside Clubhouse': 'https://www.lakesideclubhouse.org/',
-                'Lantern House': 'https://www.goodwillnynj.org/people-with-disabilities/',
-                'Legacy Center': 'http://www.genhs.org',
-                'Lexington House of Elkhart IN': 'https://www.lexingtonhouse.org/',
-                'Liberty Centre': 'http://www.libertycentreservices.com',
-                'Light of Hope Clubhouse': 'http://www.nemclubhouse.com',
-                'Looking Ahead Clubhouse': 'http://www.lookingaheadclubhouse.org',
-                'Magnolia Clubhouse': 'http://www.magnoliaclubhouse.org',
-                'Mariposa Clubhouse': 'https://www.mariposaclubhouse.org',
-                'Mid City Clubhouse New Orleans': 'https://namisela.org/',
-                'Milestone Clubhouse': 'https://www.breakthroughwichita.org/clubhouse/',
-                'Miracle Clubhouse': 'http://www.gesmv.org',
-                'Mosaic House': 'https://mohoclubhouse.ju.mp/#',
-                'NAMI San Diego Connection 2 Community Clubhouse': 'http://facebook.com/namisdc2c',
-                'Neponset River House': 'http://www.neponsetriverhouse.org',
-                'New Beginnings Clubhouse': 'http://www.nbclubhouse.org',
-                'New Directions Clubhouse': 'http://www.develctrs.org',
-                'New Reflection House': 'https://valleycares.com/treatment-and-services/specialty-programs/new-reflection-house',
-                'NorthStar Clubhouse': 'http://www.northstarclubhouse.org',
-                'Northern Lights Clubhouse': 'http://www.facebook.com/nlch1994',
-                'Oasis Clubhouse': 'https://www.kickstartsd.org/',
-                'Oasis House': 'http://Oasishouseyork.org',
-                'Odyssey House': 'https://viability.org/',
-                'Opportunity Center': 'https://www.touchstoneservices.org/the-opportunity-center',
-                'Opportunity Centre': 'http://www.skillsofcentralpa.org',
-                'Options Clubhouse': 'http://www.employmentoptions.org',
-                'Ora Clubhouse': 'http://www.theoraclubhouse.org',
-                'Our Clubhouse': 'http://www.bamsi.org',
-                'Our Place of Hope Clubhouse': 'http://www.ourplaceofhope.org',
-                'Outlook': 'http://www.adaptinc.org',
-                'PHA Clubhouse': 'https://phaclubhouse.com/',
-                'Pathfinder Clubhouse': 'http://www.pathfinderclubhouse.org',
-                'Pathway to Hope Clubhouse': 'https://pathwaytohope.org/what-we-do/clubhouse/',
-                'Petoskey Club': 'https://www.petoskeyclub.org/',
-                'Phoenix House': 'https://phoenixiccd.org',
-                'Plymouth Bay House': 'https://vinfenclubhouses.org/plymouthbay/',
-                'Point After Club': 'https://vinfenclubhouses.org/pointafter/',
-                'Polaris House': 'http://www.polarishouseak.org',
-                'Queen City Clubhouse': 'https://www.qcclubhouse.org/',
-                'Railway Clubhouse': 'https://www.breakthroughwichita.org/railway-clubhouse/',
-                'Rainbow Club': 'http://www.bowencsc.org',
-                'Renaissance Club': 'https://www.renaissanceclublowell.org/',
-                'Resilience Clubhouse': 'https://resilienceclubhouse.org/',
-                'River Raisin Clubhouse': 'https://www.monroecmha.org/resources-river-raisin-clubhouse/',
-                'Robbie\'s House': 'https://www.robbieshouselaramie.com/',
-                'Salamander House': 'https://www.kitsapmentalhealth.org/',
-                'Salem Connection': 'http://salemconnections.org',
-                'Sally and Howard Levin Clubhouse': 'http://www.shlclubhouse.org',
-                'San Angelo Clubhouse': 'http://www.sanangeloclubhouse.org',
-                'San Antonio Clubhouse': 'http://www.saclubhouse.org',
-                'Sanctuary House': 'http://www.sanctuaryhousegso.com',
-                'Sand Creek Connections': 'https://namifarnorth.org/sand-creek-clubhouse/',
-                'Seattle Clubhouse': 'http://www.seattleclubhouse.org',
-                'Sheldon Clubhouse': 'https://www.sheldonclubhouse.org/',
-                'Shore House': 'https://shorehousenj.org',
-                'Side by Side Brain Injury Clubhouse': 'http://www.sidebysideclubhouse.org',
-                'Skagit Clubhouse': 'https://www.skagitclubhouse.org/',
-                'Smith County Clubhouse': 'https://www.scclubhouse.org/',
-                'South Shore Place': 'https://www.loc8nearme.com/michigan/marquette/south-shore-place-clubhouse/6802945/',
-                'Spirit Crossing Clubhouse': 'https://www.summitstonehealth.org/spirit-crossing-clubhouse/',
-                'Square One Clubhouse': 'https://paclubhousecoalition.org/regions/central/square-one-clubhouse',
-                'St. Joseph House': 'https://mhihouston.org/what-we-do/mental-health-and-wellness/',
-                'Star Light Clubhouse': 'https://viability.org/',
-                'Summit County Clubhouse': 'http://summitcountyclubhouse.org/',
-                'TOP Clubhouse': 'https://goddard.org/programs/behavioral-health/topclubhouse/',
-                'Tempo Clubhouse': 'http://www.csgonline.org',
-                'The Clubhouse at Miller Beach': 'https://qualityoflifeinstitute.org',
-                'The Clubhouse of St. Joseph County.': 'http://www.clubhousesjc.org',
-                'The Key Clubhouse Kendall': 'https://www.keyclubhouse.org/',
-                'The Key Clubhouse of South Florida': 'http://www.keyclubhouse.org',
-                'The Lotus House': 'http://www.thelotuhousetopeka.org',
-                'The Meeting Place': 'http://www.themeetingplaceinc.org',
-                'The NIA Foundation Project Safe Spaces': 'https://safespacesyouth.org/',
-                'The Plaza': 'https://namisandiego.org/clubhouses/the-plaza/',
-                'The Summit Clubhouse': 'http://clubhouse-summit.org',
-                'Threshold': 'http://www.thresholdclubhouse.org',
-                'Thunderbird Clubhouse': 'http://www.thunderbirdclubhouse.org',
-                'Tradewinds': 'https://www.tradewindsclubhouse.org/',
-                'Turning Point Clubhouse': 'http://www.hegirahealth.org',
-                'Union Station Clubhouse': 'http://www.unionstationclubhouse.com',
-                'Unity House': 'https://diversushealth.org/',
-                'Unlimited Solutions Clubhouse': 'http://www.unlimitedsolutionsclubhouse.com/',
-                'Vail Hopkins Clubhouse': 'http://www.vailplace.org',
-                'Vail Ramsey County Clubhouse': 'https://vailcommunities.org/',
-                'Vail Uptown Clubhouse': 'http://www.vailcommunities.org',
-                'Venture House Queens': 'http://www.venturehouse.org',
-                'Venture House Staten Island': 'https://venturehouse.org/',
-                'Village Clubhouse': 'http://www.villageclubhouse.org',
-                'Vincent House': 'http://vincenthouse.org',
-                'Vincent House Hernando': 'http://vincenthouse.org',
-                'Vincent House Pasco': 'http://www.vincenthouse.org',
-                'Visions Clubhouse': 'http://www.cnsmi.org',
-                'Wabash Valley Friendship Clubhouse': 'n/a',
-                'Waipahu Aloha Clubhouse': 'http://www.waipahualohaclub.org',
-                'Wasatch House': 'http://www.wasatchhouse.org',
-                'West Place Clubhouse': 'N/A',
-                'Westside Clubhouse': 'https://www.westside-health.org/clubhouses',
-                'Whatcom Clubhouse': 'https://whatcomclubhouse.org/',
-                'Yahara House': 'https://www.yaharahouse.org',
-                // UGANDA
-                'Fountain House/Kampala': 'https://www.facebook.com/p/Fountain-House-Kampala-Uganda-100069075954799/',
-            };
-
-            // Assign URLs to locations
-            locations.forEach(function (loc) {
-                if (urlMap[loc.name]) {
-                    loc.url = urlMap[loc.name];
-                }
-            });
-
-            // ============================================================
-            //  COUNTRY LABELS (hardcoded centroids so they always show)
-            // ============================================================
-            var countryLabels = [
-                { name: 'Norge', lat: 65.0, lng: 13.0 },
-                { name: 'Sverige', lat: 62.0, lng: 16.0 },
-                { name: 'Finland', lat: 64.0, lng: 26.0 },
-                { name: 'Danmark', lat: 56.0, lng: 10.0 },
-                { name: 'Island', lat: 65.0, lng: -18.5 },
-                { name: 'Storbritannia', lat: 54.0, lng: -2.0 },
-                { name: 'Irland', lat: 53.5, lng: -8.0 },
-                { name: 'Frankrike', lat: 46.5, lng: 2.5 },
-                { name: 'Spania', lat: 40.0, lng: -3.5 },
-                { name: 'Portugal', lat: 39.5, lng: -8.0 },
-                { name: 'Italia', lat: 42.5, lng: 12.5 },
-                { name: 'Tyskland', lat: 51.0, lng: 10.5 },
-                { name: 'Polen', lat: 52.0, lng: 19.5 },
-                { name: '\u00d8sterrike', lat: 47.5, lng: 14.5 },
-                { name: 'Sveits', lat: 47.0, lng: 8.2 },
-                { name: 'Nederland', lat: 52.5, lng: 5.5 },
-                { name: 'Belgia', lat: 50.8, lng: 4.5 },
-                { name: 'Tsjekkia', lat: 49.8, lng: 15.5 },
-                { name: 'Romania', lat: 46.0, lng: 25.0 },
-                { name: 'Ukraina', lat: 49.0, lng: 32.0 },
-                { name: 'Russland', lat: 60.0, lng: 90.0 },
-                { name: 'Tyrkia', lat: 39.0, lng: 35.0 },
-                { name: 'Hellas', lat: 39.0, lng: 22.0 },
-                { name: 'USA', lat: 39.0, lng: -98.0 },
-                { name: 'Canada', lat: 56.0, lng: -96.0 },
-                { name: 'Mexico', lat: 23.5, lng: -102.0 },
-                { name: 'Brasil', lat: -10.0, lng: -52.0 },
-                { name: 'Argentina', lat: -35.0, lng: -65.0 },
-                { name: 'Kina', lat: 35.0, lng: 103.0 },
-                { name: 'India', lat: 22.0, lng: 79.0 },
-                { name: 'Japan', lat: 36.5, lng: 138.0 },
-                { name: 'Australia', lat: -25.0, lng: 134.0 },
-                { name: 'Sør-Afrika', lat: -30.0, lng: 25.0 },
-                { name: 'Egypt', lat: 27.0, lng: 30.0 },
-                { name: 'Nigeria', lat: 9.0, lng: 8.0 },
-                { name: 'Marokko', lat: 32.0, lng: -6.0 },
-                { name: 'Saudi-Arabia', lat: 24.0, lng: 45.0 },
-                { name: 'Iran', lat: 32.5, lng: 53.5 },
-                { name: 'Indonesia', lat: -2.0, lng: 118.0 },
-                { name: 'Sør-Korea', lat: 36.0, lng: 128.0 },
-            ];
-
-            // Combine data for HTML layer
-            var htmlData = [
-                ...locations.map(d => ({ ...d, isMarker: true })),
-                ...countryLabels.map(d => ({ ...d, isLabel: true }))
-            ];
-
-            // Randomize ripple properties for each location
-            locations.forEach(function (loc) {
-                loc.rippleSpeed = 1 + Math.random() * 2; // Speed between 1 and 3
-                loc.ripplePeriod = 1000 + Math.random() * 2500; // Period between 1s and 3.5s
-            });
-
-            // ============================================================
-            //  GLOBE
-            // ============================================================
-            var container = document.getElementById('globeViz');
-            var tooltipEl = document.getElementById('tooltip');
-
-            if (typeof Globe === 'undefined') {
-                document.body.innerHTML = '<div style="color:#f55;padding:40px;font-size:18px;">Feil: globe.gl lastet ikke. Sjekk at globe.gl.min.js finnes i mappen.</div>';
-                return;
-            }
-
-            // Create element for markers or labels
-            function createHtmlEl(d) {
-                if (d.isLabel) {
-                    var el = document.createElement('div');
-                    el.className = 'country-label';
-                    el.textContent = d.name;
-                    return el;
-                }
-
-                // Marker logic
-                var wrapper = document.createElement('div');
-                wrapper.style.position = 'relative';
-                wrapper.style.display = 'flex';
-                wrapper.style.flexDirection = 'column';
-                wrapper.style.alignItems = 'center';
-                wrapper.style.pointerEvents = 'auto';
-                wrapper.style.cursor = 'pointer';
-
-                var hexOuter = document.createElement('div');
-                hexOuter.className = 'hex-outer ' + d.type;
-
-                var hexInner = document.createElement('div');
-                hexInner.className = 'hex-inner';
-                hexOuter.appendChild(hexInner);
-                wrapper.appendChild(hexOuter);
-
-                var label = document.createElement('div');
-                label.className = 'hex-label';
-                label.textContent = d.name;
-                wrapper.appendChild(label);
-
-                var startX = 0, startY = 0;
-                wrapper.addEventListener('mousedown', function (e) {
-                    startX = e.clientX;
-                    startY = e.clientY;
-                });
-                wrapper.addEventListener('mouseup', function (e) {
-                    var dx = e.clientX - startX;
-                    var dy = e.clientY - startY;
-                    if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
-                        label.classList.toggle('visible');
-                        var popup = document.getElementById('marker-popup');
-                        if (d.url) {
-                            popup.querySelector('.popup-name').textContent = d.name;
-                            popup.querySelector('.popup-country').textContent = d.country || '';
-                            popup.querySelector('.popup-link').href = d.url;
-                            popup.querySelector('.popup-link').style.display = 'inline-block';
-                        } else {
-                            popup.querySelector('.popup-name').textContent = d.name;
-                            popup.querySelector('.popup-country').textContent = d.country || '';
-                            popup.querySelector('.popup-link').style.display = 'none';
-                        }
-                        popup.style.left = e.clientX + 15 + 'px';
-                        popup.style.top = e.clientY - 10 + 'px';
-                        var pw = 280, ph = 100;
-                        if (e.clientX + 15 + pw > window.innerWidth) popup.style.left = (e.clientX - pw - 10) + 'px';
-                        if (e.clientY - 10 + ph > window.innerHeight) popup.style.top = (e.clientY - ph) + 'px';
-                        popup.classList.add('visible');
-                    }
-                });
-
-                wrapper.addEventListener('mouseenter', function () {
-                    tooltipEl.querySelector('.tt-name').textContent = d.name;
-                    tooltipEl.querySelector('.tt-country').textContent = d.country || '';
-                    tooltipEl.classList.add('visible');
-                });
-                wrapper.addEventListener('mouseleave', function () {
-                    tooltipEl.classList.remove('visible');
-                });
-
-                return wrapper;
-            }
-
-            var world = Globe()(container)
-                .width(window.innerWidth)
-                .height(window.innerHeight)
-                .backgroundColor('#040d21')
-
-                // Globe surface
-                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-                .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-
-                // Atmosphere
-                .showAtmosphere(true)
-                .atmosphereColor('#4db8ff')
-                .atmosphereAltitude(0.2)
-
-                // Hex polygons for land
-                .hexPolygonResolution(3)
-                .hexPolygonMargin(0.35)
-                .hexPolygonColor(function () { return 'rgba(0, 220, 130, 0.2)'; })
-                .hexPolygonLabel(function (d) {
-                    var name = d.properties ? (d.properties.ADMIN || d.properties.NAME || '') : '';
-                    return '<div style="background:rgba(10,20,40,0.92);color:#d0eaff;padding:6px 12px;border-radius:6px;font-size:13px;border:1px solid rgba(100,200,255,0.3);">' + name + '</div>';
-                })
-
-                // Country border outlines (orange)
-                .polygonCapColor(function () { return 'rgba(0, 0, 0, 0)'; })
-                .polygonSideColor(function () { return 'rgba(255, 165, 0, 0.9)'; })
-                .polygonStrokeColor(function () { return 'rgba(255, 165, 0, 1)'; })
-                .polygonAltitude(0.02)
-
-                // Markers and Country Labels via HTML elements (Unicode safe!)
-                .htmlElementsData(htmlData)
-                .htmlLat('lat')
-                .htmlLng('lng')
-                .htmlAltitude(0.01)
-                .htmlElement(createHtmlEl)
-
-                // Animated rings
-                .ringsData(locations)
-                .ringLat('lat')
-                .ringLng('lng')
-                .ringMaxRadius(4)
-                .ringPropagationSpeed(function (d) { return d.rippleSpeed || 2; })
-                .ringRepeatPeriod(function (d) { return d.ripplePeriod || 2000; })
-                .ringColor(function () {
-                    return function (t) { return 'rgba(255, 80, 80, ' + (1 - t) + ')'; };
-                });
-
-            // Auto-rotate
-            var controls = world.controls();
-            controls.autoRotate = false;
-            controls.autoRotateSpeed = 0.5;
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-
-            // Start centered on Norway
-            world.pointOfView({ lat: 62, lng: 10, altitude: 2.2 }, 1500);
-
-            // Mouse tracking for tooltip
-            container.addEventListener('mousemove', function (e) {
-                tooltipEl.style.left = (e.clientX + 16) + 'px';
-                tooltipEl.style.top = (e.clientY + 16) + 'px';
-            });
-
-            // Dismiss popup when clicking outside
-            container.addEventListener('click', function (e) {
-                var popup = document.getElementById('marker-popup');
-                if (!e.target.closest('#marker-popup') && !e.target.closest('.hex-outer')) {
-                    popup.classList.remove('visible');
-                }
-            });
-
-            // Load hex polygons + country borders
-            fetch('https://raw.githubusercontent.com/vasturiano/three-globe/master/example/datasets/ne_110m_admin_0_countries.geojson')
-                .then(function (r) { return r.json(); })
-                .then(function (countries) {
-                    world.hexPolygonsData(countries.features);
-                    world.polygonsData(countries.features);
-                })
-                .catch(function (err) {
-                    console.warn('Hex land data did not load:', err);
-                });
-
-            // Responsive
-            window.addEventListener('resize', function () {
-                world.width(window.innerWidth);
-                world.height(window.innerHeight);
-            });
-
-            console.log('Globe initialized with ' + locations.length + ' locations');
-        })();
-    </script>
-
+    <script src="script.js"></script>
 </body>
 
 </html>
